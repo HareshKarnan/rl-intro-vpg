@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.distributions.normal as Normal
 import torch.optim.adam as Adam
 import time
-
+import logging
 
 class NeuralNetwork(nn.Module):
     def __init__(self,obs_dim,act_dim,hidden_size=(64,64,64),activation=nn.ReLU,output_activation=None,output_squeeze=False):
@@ -69,20 +69,29 @@ def VPG(self,env,pg_lr=1e-3,vf_lr=1e-3,epochs=100,steps_per_epoch=4000):
     train_v = Adam(valuefunction.parameters())
 
     start_time = time.time()
-    obs,rew,done,ep_ret,ep_len = env.reset(),0,False,0,0
-    batch_obs,batch_acts,batch_rtgs,batch_rets,batch_lens = [],[],[],[],[] # buffer to store everything
 
-    for epoch in range(epochs):
-        policy.eval() # freeze policy parameters
-        for t in range(steps_per_epoch):
-            # perform inference from the networks for action to take and value function
-            a,_,logp_t = policy(obs) # policy
-            v_t = valuefunction(obs) # value function
+    obs, rew, done, ep_ret, ep_len = env.reset(), 0, False, 0, 0
+    batch_obs, batch_acts, batch_rew, batch_adv, batch_lens = [], [], [], [], []  # buffer to store everything
 
-            obs,rew,done = env.step(a.data)
-            batch_acts.append(a.data)
-            batch_obs.append(obs)
-            batch_rets.append(rew)
+
+    for t in range(epochs):
+        for t in range(steps_per_epoch): # collect experience
+            policy.eval()  # freeze policy parameters
+            a, _, logp_t = policy(obs)  # policy
+            v_t = valuefunction(obs)  # value function
+
+            obs, rew, done = env.step(a.data)  # act in the environment
+            batch_acts.append(a.data)  # actions
+            batch_obs.append(obs)  # observations
+            batch_rew.append(rew)  # rewards
+
+            if done : # reached terminal state
+
+
+
+
+
+
 
 
 
