@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.distributions.normal as Normal
 import time,scipy
+import torch.functional as F
 import logging
 
 class NeuralNetwork(nn.Module):
@@ -19,35 +20,36 @@ class NeuralNetwork(nn.Module):
         self.output_activation = output_activation
         self.output_squeeze = output_squeeze
 
-        if (torch.cuda.is_available):
-            self.device = torch.device('cuda')
-        else:
-            self.device = torch.device('cpu')
+        # if (torch.cuda.is_available):
+        #     self.device = torch.device('cuda')
+        # else:
+        #     self.device = torch.device('cpu')
 
     def forward(self, input):
         x = input
+        print('input : ',x)
         for layer in self.layers[:-1]:
-            x = activation(layer(x))
-
+            x = self.activation(layer(x))
         # final output
         if self.output_activation is not None :
             x = self.output_activation(x)
         else:
-            x = layers[-1](x)
+            x = self.layers[-1](x)
 
         return x.squeeze() if self.output_squeeze else x
 
 class GaussianPolicy(nn.Module):
-    def __init__(self,obs_dim,act_dim,hidden_size=(64,64,64),activation=nn.ReLU,output_activation=None):
+    def __init__(self,obs_dim,act_dim,hidden_size=(64,64,64),activation=nn.Softmax,output_activation=None):
         super(GaussianPolicy, self).__init__()
         self.obs_dim = obs_dim
         self.act_dim = act_dim
         self.activation = activation
         self.output_activation = output_activation
         self.mu = NeuralNetwork(obs_dim,act_dim,hidden_size,activation,output_activation)
-        self.sigma = nn.Parameter(-0.5*torch.ones(act_dim,dtype=torch.float64))
+        self.sigma = nn.Parameter(-0.5*torch.ones(act_dim,dtype=torch.float32))
 
-    def forward(self, x,a): # if a is present, then it is training, else the network is in inference mode
+    def forward(self, x,a=None): # if a is present, then it is training, else the network is in inference mode
+        print('input to gaussian policy ',x)
         mu = self.mu(x)
         sigma = self.sigma.exp()
         policy = Normal(mu,sigma)
@@ -76,19 +78,19 @@ class VPG:
 
         self.start_time = time.time()
 
-    def train(self,epochs,steps_per_epoch=4000):
+    def train(self,epochs=10,steps_per_epoch=4000):
+        batch_obs, batch_acts, batch_rew, batch_val, batch_lens, batch_adv = [], [], [], [], [], []  # buffer to store everything
+        batch_logp = []
+        obs, rew, done, ep_ret, ep_len = self.env.reset(), 0, False, 0, 0
+        self.policy.eval()  # freeze policy parameters
+        self.valuefunction.eval()  # freeze valuefunction parameters
 
         for t in range(epochs):
-            batch_obs, batch_acts, batch_rew, batch_val, batch_lens,batch_adv = [], [], [], [], [],[]  # buffer to store everything
-            batch_logp = []
-            obs, rew, done, ep_ret,ep_len = self.env.reset(), 0, False, 0,0
-
-            self.policy.eval()  # freeze policy parameters
-            self.valuefunction.eval() # freeze valuefunction parameters
 
             # collect experience
             for t in range(steps_per_epoch):
-                a, _, logp_t = self.policy(obs)  # policy evaluation
+                obs_tensor = torch.tensor(obs,dtype=torch.float32)
+                a, _, logp_t = self.policy(obs_tensor)  # policy evaluation
                 v_t = self.valuefunction(obs)  # value function evaluation
 
                 obs, rew, done = self.env.step(a.data)  # act in the environment, then store the reward
@@ -109,7 +111,7 @@ class VPG:
                     # rewards to go - targets for value function
                     batch_rew = self._discount_cumsum(batch_rew,discount=self.gamma)
                     print('Episode Return : %d Episode Length : %d'%(ep_ret,ep_len))
-                    obs, rew, done, ep_ret, ep_len = self.env.reset(), 0, False, 0, 0 # reset everything for new episode
+                    obs, rew, done, ep_ret,ep_len = self.env.reset(), 0, False, 0,0 # reset everything for new episode
 
             self.policy.train() #unfreeze policy parameters
             self.valuefunction.train() # unfreeze value function parameters
@@ -120,6 +122,28 @@ class VPG:
             adv = torch.tensor(batch_adv,dtype=torch.float64)
             r = torch.tensor(batch_rew,dtype=torch.float64)
             logp_old = torch.tensor(batch_logp,dtype=torch.float64)
+            v_t = torch.tensor(batch_val,dtype=torch.float64)
+
+            # policy gradient step
+            _,logp,_ = self.policy(o,a)
+            ent = (-logp).mean() # sample estimate from entropy
+
+            #VPG loss function
+            loss_vpg_pi = -(logp*adv).mean()
+
+            # policy gradient step
+            self.train_pi.zero_grad() # set gradient buffers to zero
+            loss_vpg_pi.backward()
+            self.train_pi.step()
+
+            # value function learning
+            self.train_v.zero_grad() # set vf gradient buffers to zero
+            loss_vpg_v = F.mse_loss(v_t,r)
+            self.loss_vpg_v.backward()
+            self.train_v.step()
+
+
+
 
 
 

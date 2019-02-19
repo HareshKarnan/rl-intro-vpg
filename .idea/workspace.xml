@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="30695291-913a-4c62-b569-a6a78f7aabe9" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="30695291-913a-4c62-b569-a6a78f7aabe9" name="Default Changelist" comment="write the update function to train policy and vf networks">
+      <change afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/rl-intro-vpg.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../pytorch_tutorials/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../pytorch_tutorials/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../pytorch_tutorials/example1.py" beforeDir="false" afterPath="$PROJECT_DIR$/../pytorch_tutorials/example1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../pytorch_tutorials/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../pytorch_tutorials/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/rl-intro-vpg.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/vpg.py" beforeDir="false" afterPath="$PROJECT_DIR$/vpg.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -19,6 +16,9 @@
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/rl_intro_vpg$main.coverage" NAME="main Coverage Results" MODIFIED="1550599754899" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FUSProjectUsageTrigger">
     <session id="1920937188">
@@ -30,25 +30,25 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="2" />
+          <entry key="py" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="2" />
+          <entry key="Python" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Python Console" value="88" />
-          <entry key="py" value="4199" />
-          <entry key="txt" value="44" />
+          <entry key="py" value="7097" />
+          <entry key="txt" value="156" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="44" />
-          <entry key="Python" value="4287" />
+          <entry key="PLAIN_TEXT" value="156" />
+          <entry key="Python" value="7185" />
         </counts>
       </usages-collector>
     </session>
@@ -58,8 +58,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="12" selection-start-line="5" selection-start-column="12" selection-end-line="5" selection-end-column="12" />
+            <state relative-caret-position="105">
+              <caret line="7" column="22" lean-forward="true" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
               </folding>
@@ -70,12 +70,13 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/vpg.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="441">
-              <caret line="88" selection-start-line="88" selection-end-line="88" />
+            <state relative-caret-position="274">
+              <caret line="28" column="17" lean-forward="true" selection-start-line="28" selection-start-column="17" selection-end-line="28" selection-end-column="17" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
-                <marker date="1550511782047" expanded="true" signature="1246:2121" ph="..." />
-                <marker date="1550511782047" expanded="true" signature="2760:2761" ph="..." />
+                <marker date="1550599761928" expanded="true" signature="1440:2368" ph="..." />
+                <marker date="1550599761928" expanded="true" signature="2484:2493" ph="..." />
+                <marker date="1550599761928" expanded="true" signature="3081:3082" ph="..." />
               </folding>
             </state>
           </provider>
@@ -150,6 +151,36 @@
       </list>
     </option>
   </component>
+  <component name="RunManager">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="rl-intro-vpg" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="LD_LIBRARY_PATH" value="/home/users/haresh92/.mujoco/mjpro150/bin:/usr/lib/nvidia-410" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.main" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -168,7 +199,14 @@
       <option name="project" value="LOCAL" />
       <updated>1550444568526</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="write the update function to train policy and vf networks">
+      <created>1550591194846</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1550591194846</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -182,11 +220,12 @@
       <window_info anchor="bottom" id="Database Changes" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" show_stripe_button="false" />
       <window_info anchor="bottom" id="Python Console" weight="0.3299363" />
-      <window_info active="true" anchor="bottom" id="Terminal" visible="true" weight="0.19617835" />
+      <window_info anchor="bottom" id="Terminal" weight="0.19617835" />
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info anchor="bottom" id="File Transfer" weight="0.3299363" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3299363" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -207,27 +246,37 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="defining vpg function" />
-    <option name="LAST_COMMIT_MESSAGE" value="defining vpg function" />
+    <MESSAGE value="defining vpg function. collecting experience from env" />
+    <MESSAGE value="write the update function to train policy and vf networks" />
+    <option name="LAST_COMMIT_MESSAGE" value="write the update function to train policy and vf networks" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="12" selection-start-line="5" selection-start-column="12" selection-end-line="5" selection-end-column="12" />
+        <state relative-caret-position="105">
+          <caret line="7" column="22" lean-forward="true" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/Library/Caches/PyCharm2018.2/remote_sources/-105330917/149205384/torch/nn/functional.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="166">
+          <caret line="1349" selection-start-line="1349" selection-end-line="1349" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/vpg.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="441">
-          <caret line="88" selection-start-line="88" selection-end-line="88" />
+        <state relative-caret-position="274">
+          <caret line="28" column="17" lean-forward="true" selection-start-line="28" selection-start-column="17" selection-end-line="28" selection-end-column="17" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
-            <marker date="1550511782047" expanded="true" signature="1246:2121" ph="..." />
-            <marker date="1550511782047" expanded="true" signature="2760:2761" ph="..." />
+            <marker date="1550599761928" expanded="true" signature="1440:2368" ph="..." />
+            <marker date="1550599761928" expanded="true" signature="2484:2493" ph="..." />
+            <marker date="1550599761928" expanded="true" signature="3081:3082" ph="..." />
           </folding>
         </state>
       </provider>
