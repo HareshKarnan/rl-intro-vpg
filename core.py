@@ -1,18 +1,10 @@
-import numpy as np
-import tensorflow as tf
 import torch
 import torch.nn as nn
-import gym
-import scipy.signal
-import time
-from floatingup.utils.logx import EpochLogger
-import floatingup.algos.vpg.core as core
-from floatingup.utils.mpi_tools import mpi_fork, mpi_avg, proc_id, mpi_statistics_scalar, num_procs
-from floatingup.utils.mpi_torch import average_gradients,sync_all_params
-import torch.nn.functional as F
+import torch.distributions.normal as dist
+
 
 class NeuralNetwork(nn.Module):
-    def __init__(self,obs_dim,act_dim,hidden_size=(64,64,64),activation=torch.tanh,output_activation=None,output_squeeze=False):
+    def __init__(self,obs_dim,act_dim,hidden_size,activation,output_activation,output_squeeze):
         super(NeuralNetwork, self).__init__()
         self.obs_dim = obs_dim
         self.act_dim = act_dim
@@ -38,12 +30,11 @@ class NeuralNetwork(nn.Module):
         #     self.device = torch.device('cpu')
 
 
-    def forward(self, inp):
-        x = inp
-        print(x)
+    def forward(self, input):
+        x = input
         for layer in self.layers[:-1]:
             x = self.activation(layer(x))
-            print(x)
+
         if self.output_activation is None:
             x = self.layers[-1](x)
         else:
@@ -52,7 +43,7 @@ class NeuralNetwork(nn.Module):
         return x.squeeze() if self.output_squeeze else x
 
 class GaussianPolicy(nn.Module):
-    def __init__(self,obs_dim,act_dim,hidden_size=(64,64,64),activation=nn.Softmax,output_activation=None):
+    def __init__(self,obs_dim,act_dim,hidden_size,activation,output_activation):
         super(GaussianPolicy, self).__init__()
         self.obs_dim = obs_dim
         self.act_dim = act_dim
@@ -62,12 +53,13 @@ class GaussianPolicy(nn.Module):
                                 act_dim=act_dim,
                                 hidden_size=hidden_size,
                                 activation=activation,
-                                output_activation=output_activation)
+                                output_activation=output_activation,
+                                output_squeeze=False)
         self.sigma = nn.Parameter(-0.5*torch.ones(act_dim,dtype=torch.float32))
 
     def forward(self, x,a=None): # if a is present, then it is training, else the network is in inference mode
         mu = self.mu(x)
-        policy = Normal(mu,self.sigma.exp())
+        policy  = dist.Normal(mu,self.sigma.exp())
         pi = policy.sample()
         logp_pi = policy.log_prob(pi)
         if a is not None:
@@ -78,5 +70,22 @@ class GaussianPolicy(nn.Module):
         return pi,logp,logp_pi
 
 class ActorCritic(nn.Module):
-    def __init__(self,obs_dim,act_dim,activation=None,output_activation=None):
+    def __init__(self,obs_dim,act_dim,activation=torch.tanh,output_activation=None):
         super(ActorCritic, self).__init__()
+        self.policy = GaussianPolicy(obs_dim,
+                                     act_dim,
+                                     activation=activation,
+                                     hidden_size=(64,64,64),
+                                     output_activation=output_activation)
+        self.valuefunction = NeuralNetwork(obs_dim,
+                                           act_dim,
+                                           hidden_size=(64,64,64),
+                                           activation=torch.tanh,
+                                           output_activation=output_activation,
+                                           output_squeeze=True) # no output squeeze
+
+    def forward(self, x,a=None):
+        pi,logp,logp_pi = self.policy(x,a)
+        v = self.valuefunction(x)
+
+        return pi,logp,logp_pi,v
