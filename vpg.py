@@ -4,73 +4,7 @@ import torch.distributions.normal as Normal
 import time,scipy
 import torch.functional as F
 import logging
-
-class NeuralNetwork(nn.Module):
-    def __init__(self,obs_dim,act_dim,hidden_size=(64,64,64),activation=torch.tanh,output_activation=None,output_squeeze=False):
-        super(NeuralNetwork, self).__init__()
-        self.obs_dim = obs_dim
-        self.act_dim = act_dim
-        self.layers = nn.ModuleList()
-
-        layers = [obs_dim]+list(hidden_size)+[act_dim]
-
-        for i,layer in enumerate(layers[1:]): # except the first input layer
-            self.layers.append(nn.Linear(layers[i],layer))
-
-        # self.layers.append(nn.Linear(obs_dim,hidden_size[0])) # input layer
-        # for i in range(1,len(list(hidden_size))): # hidden layers
-        #     self.layers.append(nn.Linear(hidden_size[i-1],hidden_size[i]))
-        # self.layers.append(nn.Linear(hidden_size[-1],act_dim)) # output layer
-
-        self.activation = activation
-        self.output_activation = output_activation
-        self.output_squeeze = output_squeeze
-
-        # if (torch.cuda.is_available):
-        #     self.device = torch.device('cuda')
-        # else:
-        #     self.device = torch.device('cpu')
-
-
-    def forward(self, inp):
-        x = inp
-        print(x)
-        for layer in self.layers[:-1]:
-            x = self.activation(layer(x))
-            print(x)
-        if self.output_activation is None:
-            x = self.layers[-1](x)
-        else:
-            x = self.output_activation(self.layers[-1](x))
-
-        return x.squeeze() if self.output_squeeze else x
-
-class GaussianPolicy(nn.Module):
-    def __init__(self,obs_dim,act_dim,hidden_size=(64,64,64),activation=nn.Softmax,output_activation=None):
-        super(GaussianPolicy, self).__init__()
-        self.obs_dim = obs_dim
-        self.act_dim = act_dim
-        self.activation = activation
-        self.output_activation = output_activation
-        self.mu = NeuralNetwork(obs_dim=obs_dim,
-                                act_dim=act_dim,
-                                hidden_size=hidden_size,
-                                activation=activation,
-                                output_activation=output_activation)
-        self.sigma = nn.Parameter(-0.5*torch.ones(act_dim,dtype=torch.float32))
-
-    def forward(self, x,a=None): # if a is present, then it is training, else the network is in inference mode
-        mu = self.mu(x)
-        policy = Normal(mu,self.sigma.exp())
-        pi = policy.sample()
-        logp_pi = policy.log_prob(pi)
-        if a is not None:
-            logp = policy.log_prob(a)
-        else :
-            logp = None
-
-        return pi,logp,logp_pi
-
+import core
 
 class VPG:
     def __init__(self,env,pg_lr=1e-3,vf_lr=1e-3,gamma=0.99,lam=0.95):
@@ -78,9 +12,9 @@ class VPG:
         self.env = env
         self.obs_dim = env.observation_space.shape[0]
         self.act_dim = env.action_space.shape[0]
-        self.policy = GaussianPolicy(self.obs_dim,
+        self.policy = core.GaussianPolicy(self.obs_dim,
                                      self.act_dim)
-        self.valuefunction = NeuralNetwork(self.obs_dim,
+        self.valuefunction = core.NeuralNetwork(self.obs_dim,
                                            self.act_dim,
                                            output_squeeze=True) # no output squeeze
         # define optimizer
