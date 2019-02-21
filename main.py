@@ -5,4 +5,4 @@ env = gym.make('InvertedPendulum-v2')
 
 model = VPG(env=env)
 
-model.train(epochs=50)
+model.train(epochs=100)
